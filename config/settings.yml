@@ -1,0 +1,4 @@
+plugins:
+  bump_whispers_enabled:
+    default: true
+    client: false
