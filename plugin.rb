@@ -8,7 +8,7 @@ enabled_site_setting :bump_whispers_enabled
 
 after_initialize do
 
-  class PostRevisor
+  PostRevisor.class_eval do
     def bypass_bump?
       !@post_successfully_saved ||
         @topic_changes.errored? ||
@@ -18,7 +18,7 @@ after_initialize do
     end
   end
 
-  class PostCreator
+  PostCreator.class_eval do
     def update_topic_stats
       attrs = { updated_at: Time.now }
 
