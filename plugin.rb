@@ -8,33 +8,48 @@ enabled_site_setting :bump_whispers_enabled
 
 after_initialize do
 
-  PostRevisor.class_eval do
+  module PostRevisorExtensions 
     def bypass_bump?
-      !@post_successfully_saved ||
-        @topic_changes.errored? ||
-        @opts[:bypass_bump] == true ||
-        # REMOVED @post.whisper? ||
-        only_hidden_tags_changed?
+      byebug
+      if SiteSettings.bump_whispers_enabled
+        !@post_successfully_saved ||
+          @topic_changes.errored? ||
+          @opts[:bypass_bump] == true ||
+          only_hidden_tags_changed?
+      else
+        super
+      end
     end
   end
 
-  PostCreator.class_eval do
-    def update_topic_stats
-      attrs = { updated_at: Time.now }
+  class PostRevisor
+    prepend PostRevisorExtensions
+  end
 
-      if @post.post_type != Post.types[:whisper]
-        attrs[:last_posted_at] = @post.created_at
-        attrs[:last_post_user_id] = @post.user_id
-        attrs[:word_count] = (@topic.word_count || 0) + @post.word_count
-        attrs[:excerpt] = @post.excerpt_for_topic if new_topic?
-        attrs[:bumped_at] = @post.created_at unless @post.no_bump
+  module PostCreatorExtensions
+    private def update_topic_stats
+      byebug
+      if SiteSettings.bump_whispers_enabled 
+        attrs = { updated_at: Time.now }
+
+        if @post.post_type != Post.types[:whisper]
+          attrs[:last_posted_at] = @post.created_at
+          attrs[:last_post_user_id] = @post.user_id
+          attrs[:word_count] = (@topic.word_count || 0) + @post.word_count
+          attrs[:excerpt] = @post.excerpt_for_topic if new_topic?
+          attrs[:bumped_at] = @post.created_at unless @post.no_bump
+        else
+          attrs[:bumped_at] = @post.created_at
+        end
+
         @topic.update_columns(attrs)
       else
-        attrs[:bumped_at] = @post.created_at
-        @topic.update_columns(attrs)
+        super
       end
-
-      @topic.update_columns(attrs)
     end
+  end
+
+  class PostCreator
+    prepend PostCreatorExtensions
   end
 end
