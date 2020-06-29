@@ -10,7 +10,7 @@ after_initialize do
 
   module PostRevisorExtensions 
     def bypass_bump?
-      byebug
+
       if SiteSettings.bump_whispers_enabled
         !@post_successfully_saved ||
           @topic_changes.errored? ||
@@ -28,7 +28,7 @@ after_initialize do
 
   module PostCreatorExtensions
     private def update_topic_stats
-      byebug
+
       if SiteSettings.bump_whispers_enabled 
         attrs = { updated_at: Time.now }
 
