@@ -2,3 +2,6 @@ plugins:
   bump_whispers_enabled:
     default: true
     client: false
+  bump_whispers_categories:
+    default: ""
+    type: category_list

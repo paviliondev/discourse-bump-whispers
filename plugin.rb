@@ -11,7 +11,9 @@ after_initialize do
   module PostRevisorExtensions 
     def bypass_bump?
 
-      if SiteSettings.bump_whispers_enabled
+      if SiteSetting.bump_whispers_enabled &&
+        ([@post.topic.category_id, Category.find_by(id: @post.topic.category_id).parent_category_id] & SiteSetting.bump_whispers_categories.split("|").map(&:to_i)).any?
+
         !@post_successfully_saved ||
           @topic_changes.errored? ||
           @opts[:bypass_bump] == true ||
@@ -22,14 +24,16 @@ after_initialize do
     end
   end
 
-  class PostRevisor
+  class ::PostRevisor
     prepend PostRevisorExtensions
   end
 
   module PostCreatorExtensions
     private def update_topic_stats
 
-      if SiteSettings.bump_whispers_enabled 
+      if SiteSetting.bump_whispers_enabled &&
+        ([@post.topic.category_id, Category.find_by(id: @post.topic.category_id).parent_category_id] & SiteSetting.bump_whispers_categories.split("|").map(&:to_i)).any?
+
         attrs = { updated_at: Time.now }
 
         if @post.post_type != Post.types[:whisper]
@@ -49,7 +53,7 @@ after_initialize do
     end
   end
 
-  class PostCreator
+  class ::PostCreator
     prepend PostCreatorExtensions
   end
 end

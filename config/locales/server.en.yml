@@ -1,3 +1,4 @@
 en:
   site_settings:
     bump_whispers_enabled: "Enable whispers to be bumped"
+    bump_whispers_categories: "Categories in which whisper bumping will take effect"
