@@ -1,6 +1,7 @@
 # name: discourse-bump-whispers
 # about: Stops the bump of whispers being suppressed
 # version: 0.1
+# email contacts: robert@thepavilion.io
 # authors: Robert Barrow
 # url: https://github.com/paviliondev/discourse-bump-whispers
 
